@@ -55,9 +55,10 @@ q)type 5i
 > The character (h) is there simply because the output from type is itself a short.  
 
 - Strings and Symbols  
+
 > Text in kdb+/q is stored as either a string or a symbol.  
-> A string is a list of characters, defined using a pair of quotation marks".  
-> A symbol is an atomic datatype, defined using a single backtick`  
+> A string is a list of characters, defined using a pair of quotation marks\".  
+> A symbol is an atomic datatype, defined using a single backtick\`    
 
 ```Shell
 q)mychar:"j"
