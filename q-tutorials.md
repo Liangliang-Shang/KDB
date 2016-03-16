@@ -54,7 +54,7 @@ q)type 5i
 > The number (7/5/6) indicates the data type according to the primitive datatypes table.(7 is a long integer - the default integer data type, 5 is a short int, and 6 is int.  
 > The character (h) is there simply because the output from type is itself a short.  
 
-- Strings and Symbols 
+- Strings and Symbols  
 > Text in kdb+/q is stored as either a string or a symbol.  
 > A string is a list of characters, defined using a pair of quotation marks".  
 > A symbol is an atomic datatype, defined using a single backtick`  
