@@ -115,3 +115,71 @@ q)`$"Hello"                   / string to symbol
 q)`int$"28"                   / string to integer: returns the ASCII code for each character
 50 56i
 ```
+
+### Lists  
+```Shell
+q)a:1 2 3
+q)b:7 8 9
+q)symlist:`john`katie`david
+q)charlist:"hello"
+q)a+b
+8 10 12
+q)c:a,b                   // join
+q)c
+1 2 3 7 8 9
+q)first symlist
+`john
+q)-2#c
+8 9
+q)5#a
+1 2 3 1 2
+```
+
+- Single element lists  
+```Shell
+q)1#c
+,1
+q)type 1#c
+7h
+q)type first 1#c
+-7h
+q)enlist 5        // create a single element list
+,5
+```
+- Indexing
+```Shell
+q)list:"helloworld"
+q)list[0]
+"h"
+q)list[1 2 3]
+"ell"
+q)list 0 1 7 9
+"herd"
+```
+- Search and Comparison
+```Shell
+q)p:12 8 10 1 9 11 5 6 1 5 4 13 9 2 7 0 17 14 9 18
+q)p?9
+4
+q)p=9
+00001000000010000010b
+q)where p=9
+4 12 18
+q)p where p > 9
+12 10 11 13 17 14 18
+```
+- Mixed Lists
+```
+q)mixedlist:("hey";1;`sym;1 2 3)
+q)mixedlist
+"hey"
+1
+`sym
+1 2 3
+q)type mixedlist
+0h
+q)type each mixedlist
+10 -7 -11 7h
+q)count each mixedlist
+3 1 1 3
+```
