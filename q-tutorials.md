@@ -183,3 +183,8 @@ q)type each mixedlist
 q)count each mixedlist
 3 1 1 3
 ```
+```Shell
+q)mixedlist[0 3;1]
+"e"
+2
+```
