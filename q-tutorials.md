@@ -189,18 +189,59 @@ q)mixedlist[0 3;1]
 2
 ```
 ### Functions  
+> q recognize up to 3 implicit parameters(x, y, z), but can declare up to 8 parameter names.    
+
+> the square bracket/semicolon syntax for both passing in multiple inputs and declaring parameters.  
+
+> statements are separated by ';'  
+
 ```Shell
 q)til 5
 0 1 2 3 4
 q)sum 1 5 7 24
 37
-q){x+y+z}[1;2;3]    / q recognize up to 3 implicit parameters(x, y, z), but can declare up to 8 parameter names.
+q){x+y+z}[1;2;3]    / 3 implicit parameters
 6
-q){[a;b]b+a*a}[3;5] / the square bracket/semicolon syntax for both passing in multiple inputs and declaring parameters  
+q){[a;b]b+a*a}[3;5] / 3;5 two explicit parameters passing into a;b  
 14
-q)myfunc:{temp:x+y;temp*x*y}  / statements are separated by ';'
+q)myfunc:{temp:x+y;temp*x*y}
 q)myfunc[1;2]
 6
 q)temp              / temp is local in myfunc, not available      
 'temp
+```
+
+### Dictionaries
+> A dictionary is a mapiing between two lists: keys and values;   
+
+```<keylist>!<valuelist>```    
+
+```Shell
+q)populations:`Texas`Florida`NewYork`Illinois`California!(26448193 19552860 26448193 12882135 38332521)
+q)populations
+Texas     | 26448193
+Florida   | 19552860
+NewYork   | 26448193
+Illinois  | 12882135
+California| 38332521
+q)`a`b`c!1 2    / key list and value list must be the same length
+'length
+q)type populations  / the type of a dictionary is always 99h  
+99h
+q)populations[`Texas]
+26448193
+q)populations[`Texas`California]
+26448193 38332521
+q)populations`Texas`California
+26448193 38332521
+q)populations?38332521
+`California
+q)where populations = 26448193
+`Texas`NewYork
+q)where populations >= 26448193
+`Texas`NewYork`California
+q)key populations
+`Texas`Florida`NewYork`Illinois`California
+q)value populations
+26448193 19552860 26448193 12882135 38332521
 ```
