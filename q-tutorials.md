@@ -188,3 +188,19 @@ q)mixedlist[0 3;1]
 "e"
 2
 ```
+### Functions  
+```Shell
+q)til 5
+0 1 2 3 4
+q)sum 1 5 7 24
+37
+q){x+y+z}[1;2;3]    / q recognize up to 3 implicit parameters(x, y, z), but can declare up to 8 parameter names.
+6
+q){[a;b]b+a*a}[3;5] / the square bracket/semicolon syntax for both passing in multiple inputs and declaring parameters  
+14
+q)myfunc:{temp:x+y;temp*x*y}  / statements are separated by ';'
+q)myfunc[1;2]
+6
+q)temp              / temp is local in myfunc, not available      
+'temp
+```
