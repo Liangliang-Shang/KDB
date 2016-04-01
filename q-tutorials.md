@@ -213,8 +213,7 @@ q)temp              / temp is local in myfunc, not available
 
 ### Dictionaries
 > A dictionary is a mapiing between two lists: keys and values;   
-
-```<keylist>!<valuelist>```    
+> Syntax: <keylist>!<valuelist>      
 
 ```Shell
 q)populations:`Texas`Florida`NewYork`Illinois`California!(26448193 19552860 26448193 12882135 38332521)
