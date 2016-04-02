@@ -244,3 +244,282 @@ q)key populations
 q)value populations
 26448193 19552860 26448193 12882135 38332521
 ```
+
+### Tables
+- flip a dictionary to get a table
+```Shell
+q)mydict:`abc`def`ghi!(1 2 3;4 5 6;7 8 9)     / values are lists, all of the same length
+q)mydict
+abc| 1 2 3
+def| 4 5 6
+ghi| 7 8 9
+q)flip mydict                                 / flip the dictionary to get a table
+abc def ghi
+-----------
+1   4   7  
+2   5   8  
+3   6   9  
+```
+- define a table directly    
+> defined within parentheses with columns separated by a semicolon ";".    
+> empty square brackets at the begining means the table is unkeyed, and it has a type of 98h.    
+> while a keyed table defined some of the columns within the square brackets, and its type is 99h    
+```Shell
+q)family:([]name:`John`Mary`David;age:52 49 18;hair:`brown`black`blonde;eyes:`blue`brown`blue)
+q)family
+name  age hair   eyes 
+----------------------
+John  52  brown  blue 
+Mary  49  black  brown
+David 18  blonde blue 
+q)type family
+98h
+q)keyedtab:([a:`f`y`i]b:3 4 5;c:6 7 8)
+q)keyedtab        / the vertical line seperating the first column from the others, similar to dictionaries.
+a| b c
+-| ---
+f| 3 6
+y| 4 7
+i| 5 8
+q)type keyedtab
+99h
+```
+```Shell
+q)2!family                  / keys on the first 2 columns
+name  age| hair   eyes 
+---------| ------------
+John  52 | brown  blue 
+Mary  49 | black  brown
+David 18 | blonde blue 
+q)3!family                  / keys on the first 3 columns 
+name  age hair  | eyes 
+----------------| -----
+John  52  brown | blue 
+Mary  49  black | brown
+David 18  blonde| blue 
+q)`age`eyes xkey family     / specifies columns to key on 
+age eyes | name  hair  
+---------| ------------
+52  blue | John  brown 
+49  brown| Mary  black 
+18  blue | David blonde
+q)0!keyedtab                / unkey a keyed table
+a b c
+-----
+f 3 6
+y 4 7
+i 5 8
+q)() xkey keyedtab          / () is an empty list
+a b c
+-----
+f 3 6
+y 4 7
+i 5 8
+```
+- Index tables
+> unkeyed tables are like lists: rows are numbered starting with 0.    
+```Shell
+q)family 0 2            / multiple rows make a table. (A table is a list of dictionaries.)
+name  age hair   eyes
+---------------------
+John  52  brown  blue
+David 18  blonde blue
+q)family 1              / a single row is returned as a dictionary
+name| `Mary
+age | 49
+hair| `black
+eyes| `brown
+q)keyedtab `y           / keyed tables are dictionaries, and their rows are identified by keys instead of numbers.
+b| 4
+c| 7
+q)family`eyes           / access the columns of an unkeyed table as if it were a dictionary
+`blue`brown`blue
+```
+- Inserts and Upserts
+```Shell
+q)`family insert (`Jessica;13;`black;`blue)       / return the row indices that have been added to the table
+,3
+q)family
+name    age hair   eyes 
+------------------------
+John    52  brown  blue 
+Mary    49  black  brown
+David   18  blonde blue 
+Jessica 13  black  blue 
+q)family[3]
+name| `Jessica
+age | 13
+hair| `black
+eyes| `blue
+q)`family upsert (`Avery;30;`black;`green)        / return the name of the table modified
+`family
+q)family
+name    age hair   eyes 
+------------------------
+John    52  brown  blue 
+Mary    49  black  brown
+David   18  blonde blue 
+Jessica 13  black  blue 
+Avery   30  black  green
+q)`keyedtab insert (`p;10;20)       / successfully inserted, returned the index 
+,3
+q)`keyedtab insert (`i;11;12)       / Wrong, already has a row with key `i
+'insert
+q)`keyedtab upsert (`i;11;12)       / updated the row with the key `i and returned the table name
+`keyedtab
+q)`keyedtab upsert (`j;13;14)       / updated the row with the key `j and returned the table name
+`keyedtab
+q)keyedtab
+a| b  c 
+-| -----
+f| 3  6 
+y| 4  7 
+i| 11 12
+p| 10 20
+j| 13 14
+```
+- Quries
+> select *columns* from *table* where *condition*    
+> select *columns* by *column* from *table* where *condition*    
+> the by clause allows you to perform aggregations or group the results based on a particular column/columns   
+```Shell
+q)select from family where hair=`black
+name    age hair  eyes 
+-----------------------
+Mary    49  black brown
+Jessica 13  black blue 
+Avery   30  black green
+q)select name, hair from family where age>30
+name hair 
+----------
+John brown
+Mary black
+q)select avg age by hair from family
+hair  | age     
+------| --------
+black | 30.66667
+blonde| 18      
+brown | 52      
+q)exec name from family where eyes=`blue          / return a list as only one column is specified
+`John`David`Jessica
+q)exec name, eyes from family where hair=`black   / return a dictionary (with column names as keys) as multiple columns are requested
+name| Mary  Jessica Avery
+eyes| brown blue    green
+```
+
+- Updates and Deletes
+> return a table modified in some way    
+```Shell
+q)delete eyes from family
+name    age hair  
+------------------
+John    52  brown 
+Mary    49  black 
+David   18  blonde
+Jessica 13  black 
+Avery   30  black 
+q)update age:age+1 from family where name in `John`Mary
+name    age hair   eyes 
+------------------------
+John    53  brown  blue 
+Mary    50  black  brown
+David   18  blonde blue 
+Jessica 13  black  blue 
+Avery   30  black  green
+q)family                / the table family remains exactly the same, the update/delete statments have simply returned a result 
+name    age hair   eyes 
+------------------------
+John    52  brown  blue 
+Mary    49  black  brown
+David   18  blonde blue 
+Jessica 13  black  blue 
+Avery   30  black  green
+q)/ a backtick is added before the tablename, which is a reference to the table stored in memory, actually modify the table
+q)update surname:`Quill from `family
+`family
+q)family
+name    age hair   eyes  surname
+--------------------------------
+John    52  brown  blue  Quill  
+Mary    49  black  brown Quill  
+David   18  blonde blue  Quill  
+Jessica 13  black  blue  Quill  
+Avery   30  black  green Quill  
+q)delete from `family where name in `David`Jessica
+`family
+q)family
+name  age hair  eyes  surname
+-----------------------------
+John  52  brown blue  Quill  
+Mary  49  black brown Quill  
+Avery 30  black green Quill  
+```
+- Joins
+> *table* lj *keyed-table*    
+> *table* ij *keyed-table*    
+```Shell
+q)students:([]id:140 265 204 212 367 197 329 242;class:`green`blue`green`orange`green`blue`green`gren)
+q)students
+id  class 
+----------
+140 green 
+265 blue  
+204 green 
+212 orange
+367 green 
+197 blue  
+329 green 
+242 gren  
+q)mentors:([]class:`green`blue`violet;mentor_name:("Julia Johnson";"Teddy Rowles";"Gerald Carlier"))
+q)mentors
+class  mentor_name     
+-----------------------
+green  "Julia Johnson" 
+blue   "Teddy Rowles"  
+violet "Gerald Carlier"
+q)mentors,mentors
+class  mentor_name     
+-----------------------
+green  "Julia Johnson" 
+blue   "Teddy Rowles"  
+violet "Gerald Carlier"
+green  "Julia Johnson" 
+blue   "Teddy Rowles"  
+violet "Gerald Carlier"
+q)mentors,students
+'mismatch
+q)students lj 1!mentors
+id  class  mentor_name    
+--------------------------
+140 green  "Julia Johnson"
+265 blue   "Teddy Rowles" 
+204 green  "Julia Johnson"
+212 orange ""             
+367 green  "Julia Johnson"
+197 blue   "Teddy Rowles" 
+329 green  "Julia Johnson"
+242 gren   ""             
+q)students ij 1!mentors
+id  class mentor_name    
+-------------------------
+140 green "Julia Johnson"
+265 blue  "Teddy Rowles" 
+204 green "Julia Johnson"
+367 green "Julia Johnson"
+197 blue  "Teddy Rowles" 
+329 green "Julia Johnson"
+q)students uj mentors
+id  class  mentor_name     
+---------------------------
+140 green  ""              
+265 blue   ""              
+204 green  ""              
+212 orange ""              
+367 green  ""              
+197 blue   ""              
+329 green  ""              
+242 gren   ""              
+    green  "Julia Johnson" 
+    blue   "Teddy Rowles"  
+    violet "Gerald Carlier"
+```
